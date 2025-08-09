@@ -4,6 +4,7 @@ import "../styles/globals.css";
 import AffiliateDisclosure from "@/components/AffiliateDisclosure";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import { ToastProvider } from "@/components/Toast";
 
 export const metadata: Metadata = {
   title: {
@@ -30,10 +31,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="min-h-dvh bg-[#0b0c14] text-white antialiased">
-        <AffiliateDisclosure />
-        <SiteHeader />
-        <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">{children}</div>
-        <SiteFooter />
+        <ToastProvider>
+          <AffiliateDisclosure />
+          <SiteHeader />
+          <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">{children}</div>
+          <SiteFooter />
+        </ToastProvider>
       </body>
     </html>
   );
