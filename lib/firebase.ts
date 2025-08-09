@@ -3,13 +3,13 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAyL6xLvdPbIRd6yI8gUYA5qpj0MTV2Ya8",
-  authDomain: "glowstash-91058.firebaseapp.com",
-  projectId: "glowstash-91058",
-  storageBucket: "glowstash-91058.firebasestorage.app",
-  messagingSenderId: "103684404200",
-  appId: "1:103684404200:web:4414469386f798a091ea5d",
-  measurementId: "G-R3FND42V3K"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
 export const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
