@@ -37,13 +37,21 @@ export default function LandingSearch() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [qStr, setQStr] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
+      setLoading(true);
+      setError(null);
       try {
         const snap = await getDocs(query(collection(db, "products"), limit(400)));
-        const items: Product[] = snap.docs.map((d) => normalizeDoc(d.id, d.data() as FirestoreProduct));
+        const items: Product[] = snap.docs.map((d) =>
+          normalizeDoc(d.id, d.data() as FirestoreProduct)
+        );
         setAllProducts(items);
+      } catch (e: any) {
+        console.error(e);
+        setError(e?.message || "Failed to load products.");
       } finally {
         setLoading(false);
       }
@@ -85,7 +93,9 @@ export default function LandingSearch() {
         </p>
       </div>
 
-      {qStr.trim().length >= 2 && (
+      {error && <p className="mt-4 text-red-400">{error}</p>}
+
+      {qStr.trim().length >= 2 && !error && (
         <div className="mt-6">
           {loading ? (
             <p className="text-white/70">Loading products…</p>
