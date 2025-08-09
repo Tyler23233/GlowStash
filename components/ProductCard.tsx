@@ -19,11 +19,11 @@ export default function ProductCard({ p }: { p: Product }) {
   const { user } = useAuth();
   const toast = useToast();
 
-  const priceNum =
+  const price =
     typeof p.price === "number"
       ? p.price
       : typeof p.price === "string"
-      ? parseFloat(p.price.replace(/[^0-9.]/g, "")) // strip $ etc
+      ? parseFloat(p.price.replace(/[^0-9.]/g, ""))
       : NaN;
 
   const saveState = async (state: "own" | "want") => {
@@ -56,8 +56,13 @@ export default function ProductCard({ p }: { p: Product }) {
           <div className="text-sm opacity-80">{p.brand}</div>
           <div className="font-semibold">{p.name}</div>
         </div>
-        {Number.isFinite(priceNum) && (
-          <div className="text-right">${priceNum.toFixed(2)}</div>
+        {Number.isFinite(price) && (
+          <div className="text-right">
+            {new Intl.NumberFormat(undefined, {
+              style: "currency",
+              currency: "USD",
+            }).format(price)}
+          </div>
         )}
       </div>
 
