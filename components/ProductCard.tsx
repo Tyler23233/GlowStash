@@ -2,6 +2,7 @@
 import { db } from "@/lib/firebase";
 import { useAuth } from "./AuthProvider";
 import { collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { useToast } from "./Toast";
 
 type Product = {
   id: string;
@@ -16,6 +17,7 @@ type Product = {
 
 export default function ProductCard({ p }: { p: Product }) {
   const { user } = useAuth();
+  const toast = useToast();
 
   const priceNum =
     typeof p.price === "number"
@@ -26,16 +28,20 @@ export default function ProductCard({ p }: { p: Product }) {
 
   const saveState = async (state: "own" | "want") => {
     if (!user) {
-      alert("Create a free account to save.");
+      toast("Create a free account to save.", "error");
       return;
     }
     const ref = doc(collection(db, `userProducts/${user.uid}/items`), p.id);
-    await setDoc(
-      ref,
-      { state, addedAt: serverTimestamp(), productId: p.id },
-      { merge: true }
-    );
-    alert(`Saved as ${state}`);
+    try {
+      await setDoc(
+        ref,
+        { state, addedAt: serverTimestamp(), productId: p.id },
+        { merge: true }
+      );
+      toast(`Saved as ${state}`);
+    } catch (err: any) {
+      toast("Failed to save. Please try again.", "error");
+    }
   };
 
   return (

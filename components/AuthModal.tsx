@@ -3,13 +3,15 @@ import { useState } from "react";
 import { createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { useToast } from "./Toast";
 
 export default function AuthModal({ onClose }:{ onClose:()=>void }) {
   const [mode, setMode] = useState<"signup" | "login">("signup");
-  const [email, setEmail] = useState(""); 
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string|null>(null);
+  const toast = useToast();
 
   const handleSubmit = async (e:any) => {
     e.preventDefault(); setError(null); setLoading(true);
@@ -18,13 +20,14 @@ export default function AuthModal({ onClose }:{ onClose:()=>void }) {
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         await sendEmailVerification(cred.user);
         await setDoc(doc(db, "users", cred.user.uid), { email, createdAt: serverTimestamp() });
-        alert("Check your email for a verification link.");
+        toast("Check your email for a verification link.");
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
       onClose();
     } catch (err:any) {
       setError(err.message);
+      toast(err.message, "error");
     } finally { setLoading(false); }
   };
 
