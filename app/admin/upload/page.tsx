@@ -1,13 +1,39 @@
 "use client";
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/AuthProvider";
 import { db } from "@/lib/firebase";
 import { collection, doc, setDoc } from "firebase/firestore";
 
+// For stronger security, also enforce auth on the server via middleware or API routes.
+
 export default function UploadPage() {
+  const router = useRouter();
+  const { user } = useAuth();
   const [log, setLog] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const [authorized, setAuthorized] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const verify = async () => {
+      if (!user) {
+        setAuthorized(false);
+        return;
+      }
+      const token = await user.getIdTokenResult();
+      setAuthorized(!!token.claims?.admin);
+    };
+    verify();
+  }, [user]);
+
+  useEffect(() => {
+    if (authorized === false) router.replace("/");
+  }, [authorized, router]);
+
+  // Avoid rendering while auth status is checked
+  if (authorized !== true) return null;
 
   // Robust CSV parser (handles quoted commas)
   const parseCSV = (text: string) => {
