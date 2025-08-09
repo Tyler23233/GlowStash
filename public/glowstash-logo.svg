@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="200" viewBox="0 0 720 200">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff6fd8"/>
+      <stop offset="50%" stop-color="#ff9671"/>
+      <stop offset="100%" stop-color="#ffc75f"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="200" fill="#0b0b0f"/>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
+        font-family="Poppins, Arial, sans-serif" font-weight="800" font-size="72"
+        fill="url(#g)" letter-spacing="2">GlowStash</text>
+  <text x="50%" y="72%" dominant-baseline="middle" text-anchor="middle"
+        font-family="Poppins, Arial, sans-serif" font-size="18" fill="#e5e7eb" opacity="0.85">
+    Track what you own • Save what you want
+  </text>
+</svg>
