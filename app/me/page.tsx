@@ -14,21 +14,12 @@ import {
   setDoc,
   Timestamp,
 } from "firebase/firestore";
+import type { Product } from "@/types/product";
 
 type UserItem = {
   productId: string;
   state: "own" | "want";
   addedAt?: Timestamp;
-};
-type Product = {
-  id: string;
-  brand: string;
-  name: string;
-  price?: number | string;
-  image_url?: string;
-  product_url_sephora?: string;
-  product_url_ulta?: string;
-  product_url_amazon?: string;
 };
 
 export default function MyStuffPage() {
@@ -59,7 +50,7 @@ export default function MyStuffPage() {
         const snap = await getDocs(query(itemsRef, orderBy("addedAt", "desc")));
         const saves: UserItem[] = snap.docs.map((d) => ({
           productId: d.id,
-          ...(d.data() as any),
+          ...(d.data() as Omit<UserItem, "productId">),
         }));
 
         const products = await Promise.all(
@@ -68,16 +59,16 @@ export default function MyStuffPage() {
             if (!pSnap.exists()) return null;
             return {
               id: pSnap.id,
-              ...(pSnap.data() as any),
+              ...(pSnap.data() as Omit<Product, "id">),
               _state: it.state,
             } as Product & { _state: "own" | "want" };
           })
         );
 
-        setItems(products.filter(Boolean) as any[]);
-      } catch (e: any) {
+        setItems(products.filter(Boolean) as (Product & { _state: "own" | "want" })[]);
+      } catch (e: unknown) {
         console.error(e);
-        setError(e?.message || "Failed to load your items.");
+        setError((e as { message?: string })?.message || "Failed to load your items.");
       } finally {
         setLoading(false);
       }

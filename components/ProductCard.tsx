@@ -2,17 +2,7 @@
 import { db } from "@/lib/firebase";
 import { useAuth } from "./AuthProvider";
 import { collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
-
-type Product = {
-  id: string;
-  brand: string;
-  name: string;
-  price?: number | string;    // <— allow string or number
-  image_url?: string;
-  product_url_sephora?: string;
-  product_url_ulta?: string;
-  product_url_amazon?: string;
-};
+import type { Product } from "@/types/product";
 
 export default function ProductCard({ p }: { p: Product }) {
   const { user } = useAuth();

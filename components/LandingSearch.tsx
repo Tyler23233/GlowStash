@@ -5,23 +5,10 @@ import Fuse from "fuse.js";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, limit, query } from "firebase/firestore";
 import Link from "next/link";
-
-type FirestoreProduct = {
-  brand?: string;
-  category?: string;              // <-- your "type"
-  currency?: string;
-  image_url?: string;             // <-- your image field
-  name?: string;
-  price?: number | string;        // some docs might be string "25.0"
-  product_url_sephora?: string;
-  product_url_ulta?: string;
-  product_url_amazon?: string;
-  slug?: string;
-  tags?: string | string[];       // some docs might be a comma string
-};
+import type { Product as FirestoreProduct } from "@/types/product";
 
 // Normalized shape used by the UI
-type Product = {
+type SearchProduct = {
   id: string;
   name: string;
   brand: string;
@@ -34,7 +21,7 @@ type Product = {
 };
 
 export default function LandingSearch() {
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<SearchProduct[]>([]);
   const [qStr, setQStr] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -42,7 +29,9 @@ export default function LandingSearch() {
     (async () => {
       try {
         const snap = await getDocs(query(collection(db, "products"), limit(400)));
-        const items: Product[] = snap.docs.map((d) => normalizeDoc(d.id, d.data() as FirestoreProduct));
+        const items: SearchProduct[] = snap.docs.map((d) =>
+          normalizeDoc(d.id, d.data() as Omit<FirestoreProduct, "id">)
+        );
         setAllProducts(items);
       } finally {
         setLoading(false);
@@ -104,12 +93,12 @@ export default function LandingSearch() {
   );
 }
 
-function normalizeDoc(id: string, d: FirestoreProduct): Product {
+function normalizeDoc(id: string, d: FirestoreProduct): SearchProduct {
   // choose best outbound URL in order: Sephora -> Ulta -> Amazon
   const url =
     d.product_url_sephora || d.product_url_ulta || d.product_url_amazon || undefined;
 
-  let retailer: Product["retailer"] | undefined;
+  let retailer: SearchProduct["retailer"] | undefined;
   if (d.product_url_sephora) retailer = "Sephora";
   else if (d.product_url_ulta) retailer = "Ulta";
   else if (d.product_url_amazon) retailer = "Amazon";
@@ -139,7 +128,7 @@ function normalizeDoc(id: string, d: FirestoreProduct): Product {
   };
 }
 
-function ProductCardMini({ product }: { product: Product }) {
+function ProductCardMini({ product }: { product: SearchProduct }) {
   return (
     <div className="group rounded-xl border border-white/10 bg-white/[0.04] p-3 transition hover:-translate-y-1 hover:border-pink-300/50">
       <div className="aspect-[4/5] overflow-hidden rounded-lg bg-black/30">
